@@ -45,7 +45,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6">
         <h1 className="text-2xl font-bold text-center mb-4">
-          📝 PAGOS MARZO 2026
+          📝 PAGOS ABRIL 2026
         </h1>
 
         {/* Input */}
