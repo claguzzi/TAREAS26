@@ -26,7 +26,7 @@ export default function App() {
     if (save(tasks.filter(t => t.id !== task.id))) { setDeleted(task); if(editing?.id === task.id) setEditing(null); }
   }
   return <>
-    <header className="topbar"><a className="brand" href="#"><span>✓</span> al día.</a><span className="local-badge">● Tu espacio personal</span></header>
+    <header className="topbar"><a className="brand" href="#"><span>✓</span> TAREAS AGOSTO 26</a><span className="local-badge">● Tu espacio personal</span></header>
     <main>
       <section className="intro"><p className="eyebrow">UN POCO DE ORDEN, MÁS TRANQUILIDAD</p><h1>Haz espacio para lo importante.</h1><p>Organiza tus pendientes y avanza a tu ritmo.</p></section>
       {error && <p role="alert" className="error">{error}</p>}
