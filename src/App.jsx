@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react';
 import TaskForm from './TaskForm';
+import { alerts, notify } from './alerts';
 import { useTasks } from './useTasks';
 
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
@@ -16,9 +17,12 @@ export default function App() {
   function submit(values) {
     if (!save(editing ? tasks.map(t => t.id === editing.id ? {...t,...values} : t) : [...tasks,{...values,id:crypto.randomUUID(),completada:false,creada:Date.now()}])) return false;
     setEditing(null);
+    notify(editing ? 'Cambios guardados' : 'Tarea agregada');
     return true;
   }
-  function remove(task) {
+  async function remove(task) {
+    const result = await alerts.fire({ titleText: '¿Eliminar esta tarea?', text: task.texto, icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar', confirmButtonColor: '#be123c', focusCancel: true });
+    if (!result.isConfirmed) return;
     if (save(tasks.filter(t => t.id !== task.id))) { setDeleted(task); if(editing?.id === task.id) setEditing(null); }
   }
   return <>

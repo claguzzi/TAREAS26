@@ -1,5 +1,7 @@
 ﻿import { useState } from 'react';
 
+import { alerts } from './alerts';
+
 export function normalizeTasks(value) {
   if (!Array.isArray(value) || value.some(t => !t || typeof t.texto !== 'string')) throw new Error('Formato inválido');
   return value.map((t,index)=>({...t,id:t.id ?? `legacy-${index}`,completada:t.completada===true,notas:typeof t.notas==='string'?t.notas:'',categoria:typeof t.categoria==='string'?t.categoria:'Personal',prioridad:['alta','media','baja'].includes(t.prioridad)?t.prioridad:'media',fecha:typeof t.fecha==='string' && /^\d{4}-\d{2}-\d{2}$/.test(t.fecha)?t.fecha:'',creada:Number.isFinite(t.creada)?t.creada:typeof t.id==='number'?t.id:index}));
@@ -12,9 +14,9 @@ export function useTasks() {
   const [tasks,setTasks]=useState(initial.tasks);
   const [error,setError]=useState(initial.error);
   function save(next) {
-    if(initial.error)return false;
+    if(initial.error) { alerts.fire({ icon: 'error', titleText: 'Almacenamiento no disponible', text: initial.error }); return false; }
     try { localStorage.setItem('tareas',JSON.stringify(next)); setTasks(next);setError('');return true; }
-    catch {setError('No se pudo guardar el cambio. Comprueba el espacio y los permisos del navegador e inténtalo de nuevo.');return false;}
+    catch {const message = 'No se pudo guardar el cambio. Comprueba el espacio y los permisos del navegador e inténtalo de nuevo.';setError(message);alerts.fire({ icon: 'error', titleText: 'No se pudo guardar', text: message });return false;}
   }
   return {tasks,save,error};
 }
