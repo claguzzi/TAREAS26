@@ -1,16 +1,30 @@
-# React + Vite
+﻿# Al día · Lista de tareas
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación React + Vite sin backend. Las tareas se guardan exclusivamente en localStorage bajo la clave `tareas`, compatible con las tareas de la versión anterior.
 
-Currently, two official plugins are available:
+## Funciones
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Crear, editar, completar y eliminar tareas; deshacer la última eliminación.
+- Notas, prioridades, categorías y fechas límite.
+- Buscar por texto, notas o categoría; filtrar por estado y vencimiento.
+- Ordenar por creación, prioridad o fecha.
+- Resumen de pendientes, completadas, vencidas y progreso.
+- Interfaz adaptable a móviles y controles accesibles mediante teclado.
 
-## React Compiler
+## Desarrollo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```sh
+npm ci
+npm run dev
+```
 
-## Expanding the ESLint configuration
+Verificación: `npm run lint` y `npm run build`. Para revisar la compilación: `npm run preview`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Organización
+
+- `src/App.jsx`: vistas, filtros y acciones.
+- `src/TaskForm.jsx`: formulario de creación y edición.
+- `src/useTasks.js`: carga compatible y persistencia con manejo de errores.
+- `src/index.css`: diseño responsive.
+
+Los datos dependen del navegador y del origen (protocolo, dominio y puerto). No se sincronizan entre dispositivos. Borrar los datos del navegador elimina las tareas. Si la lectura falla, se conserva el valor original y se bloquean las escrituras para no reemplazarlo. Si falla el guardado, el cambio no se aplica y se muestra un aviso.

@@ -1,104 +1,53 @@
-import { useEffect, useState } from "react";
+﻿import { useState } from 'react';
+import TaskForm from './TaskForm';
+import { useTasks } from './useTasks';
 
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
 export default function App() {
-  const [tarea, setTarea] = useState("");
-
-  // ✅ Inicialización correcta desde localStorage
-  const [tareas, setTareas] = useState(() => {
-    const tareasGuardadas = localStorage.getItem("tareas");
-    return tareasGuardadas ? JSON.parse(tareasGuardadas) : [];
-  });
-
-  // 🔹 Guardar tareas en localStorage
-  useEffect(() => {
-    localStorage.setItem("tareas", JSON.stringify(tareas));
-  }, [tareas]);
-
-  const agregarTarea = () => {
-    if (tarea.trim() === "") return;
-
-    setTareas([
-      ...tareas,
-      {
-        id: Date.now(),
-        texto: tarea,
-        completada: false,
-      },
-    ]);
-
-    setTarea("");
-  };
-
-  const eliminarTarea = (id) => {
-    setTareas(tareas.filter((t) => t.id !== id));
-  };
-
-  const toggleTarea = (id) => {
-    setTareas(
-      tareas.map((t) =>
-        t.id === id ? { ...t, completada: !t.completada } : t
-      )
-    );
-  };
-
-  return ( 
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6">
-        <h1 className="text-2xl font-bold text-center mb-4">
-          📝 PAGOS SEPTIEMBRE 2026
-        </h1>
-
-        {/* Input */}
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={tarea}
-            onChange={(e) => setTarea(e.target.value)}
-            placeholder="Escribí una tarea..."
-            className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <button
-            onClick={agregarTarea}
-            className="bg-blue-500 text-white px-4 rounded-lg hover:bg-blue-600"
-          >
-            +
-          </button>
-        </div>
-
-        {/* Lista */}
-        <ul className="space-y-2">
-          {tareas.length === 0 && (
-            <li className="text-center text-gray-400">
-              No hay tareas aún
-            </li>
-          )}
-
-          {tareas.map((t) => (
-            <li
-              key={t.id}
-              className="flex items-center justify-between bg-gray-100 p-3 rounded-lg"
-            >
-              <span
-                onClick={() => toggleTarea(t.id)}
-                className={`cursor-pointer flex-1 ${
-                  t.completada
-                    ? "line-through text-gray-400"
-                    : "text-gray-800"
-                }`}
-              >
-                {t.texto}
-              </span>
-
-              <button
-                onClick={() => eliminarTarea(t.id)}
-                className="text-red-500 hover:text-red-700 ml-2"
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
+  const { tasks, save, error } = useTasks();
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('Todas');
+  const [sort, setSort] = useState('recent');
+  const [editing, setEditing] = useState(null);
+  const [deleted, setDeleted] = useState(null);
+  const completed = tasks.filter(t => t.completada).length;
+  const isOverdue = t => !t.completada && t.fecha && t.fecha < today();
+  const visible = tasks.filter(t => `${t.texto} ${t.notas} ${t.categoria}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()) && (filter === 'Todas' || (filter === 'Pendientes' && !t.completada) || (filter === 'Completadas' && t.completada) || (filter === 'Vencidas' && isOverdue(t)))).sort((a,b) => sort === 'date' ? (a.fecha || '9999').localeCompare(b.fecha || '9999') : sort === 'priority' ? ['alta','media','baja'].indexOf(a.prioridad) - ['alta','media','baja'].indexOf(b.prioridad) : b.creada - a.creada);
+  function submit(values) {
+    if (!save(editing ? tasks.map(t => t.id === editing.id ? {...t,...values} : t) : [...tasks,{...values,id:crypto.randomUUID(),completada:false,creada:Date.now()}])) return false;
+    setEditing(null);
+    return true;
+  }
+  function remove(task) {
+    if (save(tasks.filter(t => t.id !== task.id))) { setDeleted(task); if(editing?.id === task.id) setEditing(null); }
+  }
+  return <>
+    <header className="topbar"><a className="brand" href="#"><span>✓</span> al día.</a><span className="local-badge">● Tu espacio personal</span></header>
+    <main>
+      <section className="intro"><p className="eyebrow">UN POCO DE ORDEN, MÁS TRANQUILIDAD</p><h1>Haz espacio para lo importante.</h1><p>Organiza tus pendientes y avanza a tu ritmo.</p></section>
+      {error && <p role="alert" className="error">{error}</p>}
+      <section className="stats" aria-label="Resumen">
+        <div><span>Pendientes</span><strong>{tasks.length-completed}<small>por resolver</small></strong></div>
+        <div><span>Completadas</span><strong>{completed}<small>¡bien hecho!</small></strong></div>
+        <div><span>Vencidas</span><strong>{tasks.filter(isOverdue).length}<small>requieren atención</small></strong></div>
+        <div><span>Tu progreso · {tasks.length ? Math.round(completed/tasks.length*100) : 0}%</span><progress value={completed} max={tasks.length || 1}/><small>{completed} de {tasks.length} completadas</small></div>
+      </section>
+      <div className="workspace">
+        <aside className="panel composer"><p className="eyebrow">UN PASO A LA VEZ</p><h2>{editing ? 'Editar tarea' : '¿Qué tienes pendiente?'}</h2><TaskForm key={editing?.id || 'new'} task={editing} onSubmit={submit} onCancel={() => setEditing(null)}/><p className="storage-note">Tus tareas se guardan en este navegador con localStorage.</p></aside>
+        <section className="panel task-panel" aria-label="Lista de tareas">
+          <div className="list-heading"><h2>Mis tareas <span>{tasks.length}</span></h2><select aria-label="Ordenar tareas" value={sort} onChange={e=>setSort(e.target.value)}><option value="recent">Más recientes</option><option value="date">Vencimiento</option><option value="priority">Prioridad</option></select></div>
+          <input type="search" aria-label="Buscar tareas" placeholder="Buscar por tarea, nota o categoría…" value={search} onChange={e=>setSearch(e.target.value)}/>
+          <div className="filters" aria-label="Filtrar tareas">{['Todas','Pendientes','Completadas','Vencidas'].map(f=><button key={f} aria-pressed={filter===f} onClick={()=>setFilter(f)}>{f}</button>)}</div>
+          <ul className="task-list">{visible.map(t=><li key={t.id} className={`task ${t.completada?'completed':''}`}>
+            <input type="checkbox" checked={t.completada} aria-label={`Completar ${t.texto}`} onChange={()=>save(tasks.map(item=>item.id===t.id?{...item,completada:!item.completada}:item))}/>
+            <div className="task-content"><h3>{t.texto}</h3>{t.notas && <p>{t.notas}</p>}<div className="meta"><span className={`priority ${t.prioridad}`}>● {t.prioridad}</span><span>{t.categoria}</span>{t.fecha && <span className={isOverdue(t)?'overdue':''}>{new Date(`${t.fecha}T12:00:00`).toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})}{isOverdue(t)?' · Vencida':''}</span>}</div></div>
+            <div className="actions"><button onClick={()=>setEditing(t)} aria-label={`Editar ${t.texto}`}>Editar</button><button onClick={()=>remove(t)} aria-label={`Eliminar ${t.texto}`}>×</button></div>
+          </li>)}</ul>
+          {!visible.length && <div className="empty"><span>✓</span><h3>{tasks.length?'Sin tareas en esta vista':'Un nuevo comienzo'}</h3><p>{tasks.length?'Prueba con otra búsqueda o cambia el filtro.':'Agrega tu primera tarea y empieza a liberar espacio mental.'}</p></div>}
+          <footer className="list-footer">{visible.length} tareas visibles <span>Pequeños pasos, grandes avances.</span></footer>
+        </section>
       </div>
-    </div>
-  );
+      {deleted && <div className="toast" role="status">Tarea eliminada<button onClick={()=>{if(save([...tasks,deleted]))setDeleted(null);}}>Deshacer</button><button aria-label="Cerrar aviso" onClick={()=>setDeleted(null)}>×</button></div>}
+    </main><footer className="page-footer">Hecho para tu día a día. Sin cuentas, sin complicaciones.</footer>
+  </>;
 }
