@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 :root{--ink:#1e293b;--muted:#64748b;--border:#dce2ee;--accent:#6d28d9;--accent-soft:#ede9fe;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:#f4f6fc;font-synthesis:none}
 *{box-sizing:border-box}
 body{margin:0}
@@ -139,3 +139,5 @@ input:not([type=checkbox]),textarea,select{font-size:14px}
 .list-footer,.page-footer{font-size:12px}
 .error,.toast{font-size:14px}
 @media(max-width:640px){.local-badge{font-size:11px}.eyebrow{font-size:9px}.stats small{font-size:10px}}
+
+.stats .amount-total{grid-column:1/-1}.stats .amount-total strong{display:block;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}

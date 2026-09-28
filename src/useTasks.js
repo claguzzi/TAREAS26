@@ -1,10 +1,10 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 import { alerts } from './alerts';
 
 export function normalizeTasks(value) {
   if (!Array.isArray(value) || value.some(t => !t || typeof t.texto !== 'string')) throw new Error('Formato inválido');
-  return value.map((t,index)=>({...t,id:t.id ?? `legacy-${index}`,completada:t.completada===true,notas:typeof t.notas==='string'?t.notas:'',categoria:typeof t.categoria==='string'?t.categoria:'Personal',prioridad:['alta','media','baja'].includes(t.prioridad)?t.prioridad:'media',fecha:typeof t.fecha==='string' && /^\d{4}-\d{2}-\d{2}$/.test(t.fecha)?t.fecha:'',creada:Number.isFinite(t.creada)?t.creada:typeof t.id==='number'?t.id:index}));
+  return value.map((t,index)=>({...Object.fromEntries(Object.entries(t).filter(([key]) => key !== 'categoria')),id:t.id ?? `legacy-${index}`,completada:t.completada===true,notas:typeof t.notas==='string'?t.notas:'',monto:Number.isFinite(t.monto) && t.monto>=0?t.monto:null,prioridad:['alta','media','baja'].includes(t.prioridad)?t.prioridad:'media',fecha:typeof t.fecha==='string' && /^\d{4}-\d{2}-\d{2}$/.test(t.fecha)?t.fecha:'',creada:Number.isFinite(t.creada)?t.creada:typeof t.id==='number'?t.id:index}));
 }
 export function useTasks() {
   const [initial] = useState(()=>{
