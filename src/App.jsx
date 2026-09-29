@@ -27,7 +27,7 @@ export default function App() {
     if (save(tasks.filter(t => t.id !== task.id))) { setDeleted(task); if(editing?.id === task.id) setEditing(null); }
   }
   return <>
-    <header className="topbar"><a className="brand" href="#"><span>✓</span> TAREAS SEPTIEMBRE 26</a></header>
+    <header className="topbar"><a className="brand" href="#"><span>✓</span> PAGOS SEPTIEMBRE 26</a></header>
     <main>
       <section className="intro"><h1>Panel de tareas</h1></section>
       {error && <p role="alert" className="error">{error}</p>}
