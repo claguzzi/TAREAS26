@@ -140,4 +140,6 @@ input:not([type=checkbox]),textarea,select{font-size:14px}
 .error,.toast{font-size:14px}
 @media(max-width:640px){.local-badge{font-size:11px}.eyebrow{font-size:9px}.stats small{font-size:10px}}
 
-.stats .amount-total{grid-column:1/-1}.stats .amount-total strong{display:block;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.stats .amount-total,.stats .amount-paid{grid-column:1/-1}.stats .amount-total strong,.stats .amount-paid strong{display:block;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.stats .amount-total{background:#fff7ed;border-color:#fed7aa}.stats .amount-total strong{color:#c2410c}
+.stats .amount-paid{background:#f0fdf4;border-color:#bbf7d0}.stats .amount-paid strong{color:#15803d}

@@ -12,7 +12,8 @@ export default function App() {
   const [editing, setEditing] = useState(null);
   const [deleted, setDeleted] = useState(null);
   const completed = tasks.filter(t => t.completada).length;
-  const totalMonto = tasks.reduce((total, task) => total + Math.round((task.monto ?? 0) * 100), 0) / 100;
+  const totalMonto = tasks.reduce((total, task) => task.completada ? total : total + Math.round((task.monto ?? 0) * 100), 0) / 100;
+  const totalPagado = tasks.reduce((total, task) => task.completada ? total + Math.round((task.monto ?? 0) * 100) : total, 0) / 100;
   const isOverdue = t => !t.completada && t.fecha && t.fecha < today();
   const visible = tasks.filter(t => `${t.texto} ${t.notas} ${t.monto ?? ''}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()) && (filter === 'Todas' || (filter === 'Pendientes' && !t.completada) || (filter === 'Completadas' && t.completada) || (filter === 'Vencidas' && isOverdue(t)))).sort((a,b) => sort === 'date' ? (a.fecha || '9999').localeCompare(b.fecha || '9999') : sort === 'priority' ? ['alta','media','baja'].indexOf(a.prioridad) - ['alta','media','baja'].indexOf(b.prioridad) : b.creada - a.creada);
   function submit(values) {
@@ -36,7 +37,8 @@ export default function App() {
         <div><span>Completadas</span><strong>{completed}</strong></div>
         <div><span>Vencidas</span><strong>{tasks.filter(isOverdue).length}</strong></div>
         <div><span>Tu progreso · {tasks.length ? Math.round(completed/tasks.length*100) : 0}%</span><progress value={completed} max={tasks.length || 1}/><small>{completed} de {tasks.length} completadas</small></div>
-        <div className="amount-total"><span>Monto total</span><strong aria-live="polite">{totalMonto.toLocaleString('es', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong><small>Todas las tareas</small></div>
+        <div className="amount-total"><span>Monto total pendiente</span><strong aria-live="polite">{totalMonto.toLocaleString('es', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong><small>Las tareas completadas ya están descontadas</small></div>
+        <div className="amount-paid"><span>Monto total pagado</span><strong aria-live="polite">{totalPagado.toLocaleString('es', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong><small>Suma de las tareas completadas</small></div>
       </section>
       <div className="workspace">
         <aside className="panel composer"><h2>{editing ? 'Editar tarea' : 'Nueva tarea'}</h2><TaskForm key={editing?.id || 'new'} task={editing} onSubmit={submit} onCancel={() => setEditing(null)}/><p className="storage-note">Las tareas se guardan en este navegador.</p></aside>
