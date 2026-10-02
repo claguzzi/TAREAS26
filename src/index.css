@@ -62,6 +62,7 @@ input::placeholder,textarea::placeholder{color:var(--muted)}
 .baja{background:#d1fae5;color:#047857}
 .overdue{color:#be123c}
 .completed h3{text-decoration:line-through;color:var(--muted)}
+.task.completed>input{accent-color:#16a34a}
 .actions{display:flex;gap:10px;align-items:center}
 .actions button{border:0;background:transparent;font-size:10px;color:var(--muted);padding:4px}
 .actions button:last-child{font-size:20px;line-height:1;color:#be123c}
